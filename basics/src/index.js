@@ -7,8 +7,9 @@ import {
 // Type definitions (schema)
 const typeDefs = `
     type Query {
-        add(a: Float!, b: Float!): Float!
+        add(numbers: [Float!]!): Float!
         greeting(name: String, position: String): String!
+        grades: [Int!]!
         me: User!
         post: Post!
     }
@@ -32,8 +33,14 @@ const typeDefs = `
 const resolvers = {
     Query: {
         add(parent, args, ctx, info) {
-            return args.a + args.b
+            if (args.numbers.length === 0) {
+                return 0
+            }
+            return args.numbers.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue
+            })
         },
+    
         greeting(parent, args, ctx, info) {
             if (args.name && args.position) {
                 return `Hello ${args.name}! You are my favorite ${args.position}.`
@@ -41,6 +48,10 @@ const resolvers = {
                 return `Hello!`
             }
         },
+        grades(parent, args, ctx, info) {
+            return [100, 89, 97]
+        },
+
         me() {
             return {
                 id: '1',
