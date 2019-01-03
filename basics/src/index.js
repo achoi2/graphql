@@ -4,14 +4,52 @@ import {
 
 // Scalar types - String, Boolean, Int, Float, ID
 
+// user data
+const users = [{
+        id: '1',
+        name: 'andrew',
+        email: 'andrew@example.com',
+        age: 28
+    },
+    {
+        id: '2',
+        name: 'steve',
+        email: 'steve@example.com',
+    },
+    {
+        id: '3',
+        name: 'amy',
+        email: 'amy@example.com',
+    }
+]
+
+// posts data
+const posts = [{
+        id: '1',
+        title: 'first',
+        body: 'This is the first post',
+        published: true
+    },
+    {
+        id: '2',
+        title: 'second',
+        body: 'This is the second post',
+        published: true
+    },
+    {
+        id: '3',
+        title: 'third',
+        body: 'This is the third post',
+        published: true
+    }
+]
+
 // Type definitions (schema)
 const typeDefs = `
     type Query {
-        add(numbers: [Float!]!): Float!
-        greeting(name: String, position: String): String!
-        grades: [Int!]!
+        users(query: String): [User!]!
         me: User!
-        post: Post!
+        post(query: String): [Post!]!
     }
     
     type User {
@@ -32,24 +70,14 @@ const typeDefs = `
 // Resolvers
 const resolvers = {
     Query: {
-        add(parent, args, ctx, info) {
-            if (args.numbers.length === 0) {
-                return 0
+        users(parent, args, ctx, info) {
+            if (!args.query) {
+                return users
             }
-            return args.numbers.reduce((accumulator, currentValue) => {
-                return accumulator + currentValue
+
+            return users.filter((user) => {
+                return user.name.toLowerCase().includes(args.query.toLowerCase())
             })
-        },
-    
-        greeting(parent, args, ctx, info) {
-            if (args.name && args.position) {
-                return `Hello ${args.name}! You are my favorite ${args.position}.`
-            } else {
-                return `Hello!`
-            }
-        },
-        grades(parent, args, ctx, info) {
-            return [100, 89, 97]
         },
 
         me() {
@@ -59,14 +87,18 @@ const resolvers = {
                 email: 'steve@example.com'
             }
         },
-    
-        post() {
-            return {
-                id: '1',
-                title: 'First Post',
-                body: 'This is my first post',
-                published: true
+
+        post(parent, args, ctx, info) {
+            if (!args.query) {
+                return posts
             }
+
+            return posts.filter((post) => {
+                const titleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
+                const bodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
+
+                return bodyMatch || titleMatch
+            })
         }
     }
 }
