@@ -28,19 +28,22 @@ const posts = [{
         id: '1',
         title: 'first',
         body: 'This is the first post',
-        published: true
+        published: true,
+        author: '1'
     },
     {
         id: '2',
         title: 'second',
         body: 'This is the second post',
-        published: true
+        published: true,
+        author: '1'
     },
     {
         id: '3',
         title: 'third',
         body: 'This is the third post',
-        published: true
+        published: true,
+        author: '2'
     }
 ]
 
@@ -64,6 +67,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     }
 `
 
@@ -98,6 +102,13 @@ const resolvers = {
                 const bodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
 
                 return bodyMatch || titleMatch
+            })
+        }
+    },
+    Post: {
+        author(parent, args, ctx, info) {
+            return users.find((user) => {
+                return user.id === parent.author
             })
         }
     }
